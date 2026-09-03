@@ -9,7 +9,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("api/v1/member")
+@RequestMapping("/member")
 @Validated
 public class MemberController {
 
@@ -30,6 +30,6 @@ public class MemberController {
     public ResponseEntity<?> requestRegister(@Valid @RequestBody MemberRequestDTO member){
         MemberResponseDTO responseBody = memberService.registerMember(member);
 
-        return ResponseEntity.ok().body(responseBody);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
     }
 }

@@ -16,10 +16,8 @@ public class Member {
     @Id
     private Long id;
 
-    @NotBlank
     private String name;
 
-    @Email
     @Column(unique=true)
     private String email;
 

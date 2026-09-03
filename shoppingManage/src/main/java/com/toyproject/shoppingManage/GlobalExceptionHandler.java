@@ -1,5 +1,6 @@
 package com.toyproject.shoppingManage;
 
+import com.toyproject.shoppingManage.Item.Exception.ItemNotFoundException;
 import com.toyproject.shoppingManage.Member.Exception.DuplicateMemberException;
 import com.toyproject.shoppingManage.Member.Exception.MemberNotFoundException;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MemberNotFoundException.class)
     public ResponseEntity<?> handleMemberNotFoundException(MemberNotFoundException e){
+        ErrorCode errorCode = e.getErrorCode();
+        return returnResponseEntity(errorCode);
+    }
+
+    @ExceptionHandler(ItemNotFoundException.class)
+    public ResponseEntity<?> handleItemNotFoundException(ItemNotFoundException e){
         ErrorCode errorCode = e.getErrorCode();
         return returnResponseEntity(errorCode);
     }
