@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "Item")
@@ -34,5 +35,9 @@ public class Item {
                 request.price(),
                 request.stock()
         );
+    }
+
+    public void decreaseStock(int value){
+        stock -= value;
     }
 }
