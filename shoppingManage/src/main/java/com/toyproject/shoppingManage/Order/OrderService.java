@@ -36,8 +36,7 @@ public class OrderService {
             if(item.getStock() < requestItem.quantity())
                 throw new NotEnoughStockException(ErrorCode.NOT_ENOUGH_STOCK);
 
-            int left = item.getStock() - requestItem.quantity();
-            item.setStock(left);
+            item.decreaseStock(requestItem.quantity());
             itemRepository.save(item);
 
             items.add(OrderItem.from(requestItem, item));

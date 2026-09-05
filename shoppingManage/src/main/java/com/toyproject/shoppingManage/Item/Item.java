@@ -37,7 +37,7 @@ public class Item {
         );
     }
 
-    public void setStock(int value){
-        stock = value;
+    public void decreaseStock(int value){
+        stock -= value;
     }
 }
