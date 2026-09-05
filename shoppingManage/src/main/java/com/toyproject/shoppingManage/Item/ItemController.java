@@ -28,6 +28,6 @@ public class ItemController {
     public ResponseEntity<?> requestRegister(@Valid @RequestBody ItemRequestDTO request){
         ItemResponseDTO responseBody = itemService.registerItem(request);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body("상품 등록이 완료되었습니다.");
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
     }
 }
