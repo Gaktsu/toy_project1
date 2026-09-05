@@ -15,7 +15,6 @@ import lombok.Setter;
 @Setter
 public class OrderItem {
     @Id
-    @JoinColumn(name = "order_item_id")
     @GeneratedValue
     private Long id;
 

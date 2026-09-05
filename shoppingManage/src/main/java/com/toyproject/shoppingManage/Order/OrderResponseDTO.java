@@ -9,7 +9,7 @@ import java.util.List;
 
 public record OrderResponseDTO(
         Long id,
-        Long memberId,
+        Member member,
         List<OrderItemResponseDTO> items
 ) {
 
@@ -20,6 +20,6 @@ public record OrderResponseDTO(
             responseItems.add(OrderItemResponseDTO.from(orderItem.getItem(), orderItem));
         }
 
-        return new OrderResponseDTO(order.getId(), order.getMember_id(), responseItems);
+        return new OrderResponseDTO(order.getId(), order.getMember(), responseItems);
     }
 }

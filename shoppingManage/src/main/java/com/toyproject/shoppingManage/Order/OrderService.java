@@ -43,7 +43,7 @@ public class OrderService {
             items.add(OrderItem.from(requestItem, item));
         }
 
-        Order order = new Order(member.getId(), items);
+        Order order = new Order(member, items);
 
         orderRepository.save(order);
 

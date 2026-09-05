@@ -21,17 +21,17 @@ public class Order {
     @Id
     private Long id;
 
-    @JoinColumn(name = "member_id")
-    private Long member_id;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member")
+    private Member member;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> orderItems = new ArrayList<>();
 
-    public Order(Long member_id, List<OrderItem> orderItems){
-        this.member_id = member_id;
+    public Order(Member member, List<OrderItem> orderItems){
+        this.member = member;
 
         for(var item : orderItems){
-            this.orderItems.add(item);
             item.setOrder(this);
         }
 

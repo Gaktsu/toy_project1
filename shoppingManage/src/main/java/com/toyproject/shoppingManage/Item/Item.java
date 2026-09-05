@@ -10,7 +10,6 @@ import lombok.Setter;
 @Entity
 @Table(name = "Item")
 @Getter
-@Setter
 public class Item {
 
     @Id
@@ -36,5 +35,9 @@ public class Item {
                 request.price(),
                 request.stock()
         );
+    }
+
+    public void setStock(int value){
+        stock = value;
     }
 }
