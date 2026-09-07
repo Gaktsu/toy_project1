@@ -12,6 +12,7 @@ import com.toyproject.shoppingManage.Order.Exception.OrderNotFoundException;
 import com.toyproject.shoppingManage.Order.OrderItems.OrderItem;
 import jakarta.validation.constraints.Min;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +52,7 @@ public class OrderService {
         return OrderResponseDTO.from(order);
     }
 
+    @Transactional(readOnly = true)
     public OrderResponseDTO getOrder(Long id) {
         Order order = orderRepository.findById(id).orElseThrow(() -> new OrderNotFoundException(ErrorCode.ORDER_NOT_FOUND));
 

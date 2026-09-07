@@ -3,6 +3,7 @@ package com.toyproject.shoppingManage.Order;
 import com.toyproject.shoppingManage.Member.Member;
 import com.toyproject.shoppingManage.Order.OrderItems.OrderItem;
 import com.toyproject.shoppingManage.Order.OrderItems.OrderItemResponseDTO;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;

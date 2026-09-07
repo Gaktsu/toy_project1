@@ -13,7 +13,6 @@ public class ItemService {
         this.itemRepository = itemRepository;
     }
 
-    @Transactional
     public ItemResponseDTO registerItem(ItemRequestDTO request){
         Item item = itemRepository.save(Item.from(request));
 
