@@ -4,6 +4,7 @@ import com.toyproject.shoppingManage.Item.Exception.ItemNotFoundException;
 import com.toyproject.shoppingManage.Member.Exception.DuplicateMemberException;
 import com.toyproject.shoppingManage.Member.Exception.MemberNotFoundException;
 import com.toyproject.shoppingManage.Order.Exception.NotEnoughStockException;
+import com.toyproject.shoppingManage.Order.Exception.OrderNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -31,6 +32,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(NotEnoughStockException.class)
     public ResponseEntity<?> handleNotEnoughStockException(NotEnoughStockException e){
+        ErrorCode errorCode = e.getErrorCode();
+        return returnResponseEntity(errorCode);
+    }
+
+    @ExceptionHandler(OrderNotFoundException.class)
+    public ResponseEntity<?> handleOrderNotFoundException(OrderNotFoundException e){
         ErrorCode errorCode = e.getErrorCode();
         return returnResponseEntity(errorCode);
     }

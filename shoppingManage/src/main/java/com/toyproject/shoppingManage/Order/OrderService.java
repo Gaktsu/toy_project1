@@ -8,7 +8,9 @@ import com.toyproject.shoppingManage.Member.Exception.MemberNotFoundException;
 import com.toyproject.shoppingManage.Member.Member;
 import com.toyproject.shoppingManage.Member.MemberRepository;
 import com.toyproject.shoppingManage.Order.Exception.NotEnoughStockException;
+import com.toyproject.shoppingManage.Order.Exception.OrderNotFoundException;
 import com.toyproject.shoppingManage.Order.OrderItems.OrderItem;
+import jakarta.validation.constraints.Min;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -45,6 +47,12 @@ public class OrderService {
         Order order = new Order(member, items);
 
         orderRepository.save(order);
+
+        return OrderResponseDTO.from(order);
+    }
+
+    public OrderResponseDTO getOrder(Long id) {
+        Order order = orderRepository.findById(id).orElseThrow(() -> new OrderNotFoundException(ErrorCode.ORDER_NOT_FOUND));
 
         return OrderResponseDTO.from(order);
     }

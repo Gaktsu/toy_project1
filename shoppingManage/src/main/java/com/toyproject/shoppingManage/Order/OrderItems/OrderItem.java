@@ -12,10 +12,9 @@ import lombok.Setter;
 @Table(name = "Order_Items")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@Setter
 public class OrderItem {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -36,4 +35,6 @@ public class OrderItem {
     public static OrderItem from(OrderItemRequestDTO request, Item item){
         return new OrderItem(item, request.quantity());
     }
+
+    public void setOrder(Order order){ this.order = order; }
 }
