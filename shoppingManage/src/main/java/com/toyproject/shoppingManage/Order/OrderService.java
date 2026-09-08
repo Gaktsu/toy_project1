@@ -58,4 +58,16 @@ public class OrderService {
 
         return OrderResponseDTO.from(order);
     }
+
+    @Transactional
+    public void deleteOrder(@Min(value = 1) Long id) {
+        Order order = orderRepository.findById(id).orElseThrow(() -> new OrderNotFoundException(ErrorCode.ORDER_NOT_FOUND));
+
+        for(var orderitem : order.getOrderItems()){
+            Item item = orderitem.getItem();
+            item.increaseStock(orderitem.getQuantity());
+        }
+
+        orderRepository.delete(order);
+    }
 }

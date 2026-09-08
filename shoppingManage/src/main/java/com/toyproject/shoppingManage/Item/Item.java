@@ -40,4 +40,5 @@ public class Item {
     public void decreaseStock(int value){
         stock -= value;
     }
+    public void increaseStock(int value) { stock += value; }
 }
