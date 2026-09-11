@@ -13,6 +13,9 @@ import lombok.Setter;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class OrderItem {
+
+    // ----------------------- FIELD --------------------------//
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,14 +30,20 @@ public class OrderItem {
 
     private int quantity;
 
+    // ----------------------- CONSTRUCTOR --------------------------//
+
     public OrderItem(Item item, int quantity){
         this.item = item;
         this.quantity = quantity;
     }
 
+    // ----------------------- FACTORY METHOD --------------------------//
+
     public static OrderItem from(OrderItemRequestDTO request, Item item){
         return new OrderItem(item, request.quantity());
     }
+
+    // ----------------------- METHOD --------------------------//
 
     public void setOrder(Order order){ this.order = order; }
 }

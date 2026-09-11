@@ -18,6 +18,8 @@ import java.util.List;
 @Getter
 public class Order {
 
+    // ----------------------- FIELD --------------------------//
+
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private Long id;
@@ -28,6 +30,8 @@ public class Order {
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<OrderItem> orderItems = new ArrayList<>();
+
+    // ----------------------- CONSTRUCTOR --------------------------//
 
     public Order(Member member, List<OrderItem> orderItems){
         this.member = member;

@@ -9,26 +9,34 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/member")
+@RequestMapping("/members")
 @Validated
 public class MemberController {
 
+    // ----------------------- FIELD --------------------------//
+
     private final MemberService memberService;
+
+    // ----------------------- CONSTRUCTOR --------------------------//
 
     public MemberController(MemberService memberService){
         this.memberService = memberService;
     }
 
+    // ----------------------- RESTAPI : GET --------------------------//
+
     @GetMapping("/{id}")
     public ResponseEntity<?> requestGetMember(@PathVariable("id") @Min(value = 1) Long id){
-        MemberResponseDTO responseBody = memberService.getMember(id);
+        MemberResponseDTO responseBody = memberService.requestGetMember(id);
 
         return ResponseEntity.ok().body(responseBody);
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<?> requestRegister(@Valid @RequestBody MemberRequestDTO member){
-        MemberResponseDTO responseBody = memberService.registerMember(member);
+    // ----------------------- RESTAPI : POST --------------------------//
+
+    @PostMapping
+    public ResponseEntity<?> requestRegister(@Valid @RequestBody MemberRequestDTO request){
+        MemberResponseDTO responseBody = memberService.requestRegisterMember(request);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
     }

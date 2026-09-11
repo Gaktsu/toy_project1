@@ -5,6 +5,8 @@ import com.toyproject.shoppingManage.Item.Exception.ItemNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.util.function.Predicate;
+
 @Service
 public class ItemService {
     private final ItemRepository itemRepository;
@@ -13,15 +15,31 @@ public class ItemService {
         this.itemRepository = itemRepository;
     }
 
-    public ItemResponseDTO registerItem(ItemRequestDTO request){
+    // ----------------------- RESTAPI : GET --------------------------//
+
+    public ItemResponseDTO requestGetItem(Long id){
+        Item item = itemRepository.findById(id).orElseThrow(() -> new ItemNotFoundException(ErrorCode.ITEM_NOT_FOUND));
+
+        return ItemResponseDTO.from(item);
+    }
+
+    // ----------------------- RESTAPI : POST --------------------------//
+
+    public ItemResponseDTO requestRegisterItem(ItemRequestDTO request){
         Item item = itemRepository.save(Item.from(request));
 
         return ItemResponseDTO.from(item);
     }
 
-    public ItemResponseDTO getItem(Long id){
-        Item item = itemRepository.findById(id).orElseThrow(() -> new ItemNotFoundException(ErrorCode.ITEM_NOT_FOUND));
+    // ----------------------- METHOD --------------------------//
 
-        return ItemResponseDTO.from(item);
+    /*
+    public Item getItem(Long id){
+        return itemRepository.findById(id).orElseThrow(() -> new ItemNotFoundException(ErrorCode.ITEM_NOT_FOUND));
     }
+
+    public void updateItem(Item item){
+        itemRepository.save(item);
+    }
+    */
 }

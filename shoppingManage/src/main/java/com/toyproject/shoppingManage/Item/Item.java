@@ -1,5 +1,7 @@
 package com.toyproject.shoppingManage.Item;
 
+import com.toyproject.shoppingManage.ErrorCode;
+import com.toyproject.shoppingManage.Order.Exception.NotEnoughStockException;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
@@ -12,6 +14,8 @@ import lombok.Setter;
 @Getter
 public class Item {
 
+    // ----------------------- FIELD --------------------------//
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,6 +25,8 @@ public class Item {
 
     private Integer stock;
 
+    // ----------------------- CONSTRUCTOR --------------------------//
+
     protected Item() {}
 
     public Item(String name, Integer price, Integer stock){
@@ -28,6 +34,8 @@ public class Item {
         this.price = price;
         this.stock = stock;
     }
+
+    // ----------------------- FACTORY METHOD --------------------------//
 
     public static Item from(ItemRequestDTO request){
         return new Item(
@@ -37,8 +45,13 @@ public class Item {
         );
     }
 
-    public void decreaseStock(int value){
-        stock -= value;
+    // ----------------------- METHOD --------------------------//
+
+    public void decreaseStock(int quantity){
+        if(stock < quantity)
+            throw new NotEnoughStockException(ErrorCode.NOT_ENOUGH_STOCK);
+
+        stock -= quantity;
     }
     public void increaseStock(int value) { stock += value; }
 }

@@ -11,22 +11,30 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/items")
 @Validated
 public class ItemController {
+
+    // ----------------------- FIELD --------------------------//
+
     private final ItemService itemService;
+
+    // ----------------------- CONSTRUCTOR --------------------------//
 
     public ItemController(ItemService itemService){
         this.itemService = itemService;
     }
 
+    // ----------------------- RESTAPI : GET --------------------------//
     @GetMapping("/{id}")
     public ResponseEntity<?> requestGetItem(@PathVariable @Min(value = 1) Long id){
-        ItemResponseDTO responseBody = itemService.getItem(id);
+        ItemResponseDTO responseBody = itemService.requestGetItem(id);
 
         return ResponseEntity.ok().body(responseBody);
     }
 
+    // ----------------------- RESTAPI : POST --------------------------//
+
     @PostMapping
     public ResponseEntity<?> requestRegister(@Valid @RequestBody ItemRequestDTO request){
-        ItemResponseDTO responseBody = itemService.registerItem(request);
+        ItemResponseDTO responseBody = itemService.requestRegisterItem(request);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
     }
