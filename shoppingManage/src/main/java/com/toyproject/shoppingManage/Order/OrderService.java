@@ -40,7 +40,7 @@ public class OrderService {
 
     @Transactional(readOnly = true)
     public List<OrderResponseDTO> requestGetOrders() {
-        return orderRepository.findAll().stream().map(OrderResponseDTO::from).toList();
+        return orderRepository.findOrderWithItems().stream().map(OrderResponseDTO::from).toList();
     }
 
     @Transactional(readOnly = true)
