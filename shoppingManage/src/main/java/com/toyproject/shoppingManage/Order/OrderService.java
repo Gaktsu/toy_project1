@@ -13,6 +13,8 @@ import com.toyproject.shoppingManage.Order.Exception.NotEnoughStockException;
 import com.toyproject.shoppingManage.Order.Exception.OrderNotFoundException;
 import com.toyproject.shoppingManage.Order.OrderItems.OrderItem;
 import jakarta.validation.constraints.Min;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,8 +41,14 @@ public class OrderService {
     // ----------------------- RESTAPI : GET --------------------------//
 
     @Transactional(readOnly = true)
-    public List<OrderResponseDTO> requestGetOrders() {
-        return orderRepository.findOrderWithItems().stream().map(OrderResponseDTO::from).toList();
+    public List<OrderResponseDTO> requestGetOrders(Pageable pageable) {
+        /* 일반적인 페이징
+        Page<Order> orders = orderRepository.findAll(pageable);
+        return orders.stream().map(OrderResponseDTO::from).toList();
+        */
+
+        // Collection Fetch Join + 페이징
+        return orderRepository.findOrderWithItems(pageable).stream().map(OrderResponseDTO::from).toList();
     }
 
     @Transactional(readOnly = true)

@@ -2,6 +2,9 @@ package com.toyproject.shoppingManage.Order;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -27,8 +30,8 @@ public class OrderController {
     // ----------------------- RESTAPI : GET --------------------------//
 
     @GetMapping
-    public ResponseEntity<?> requestGetOrders(){
-        List<OrderResponseDTO> responseBody = orderService.requestGetOrders();
+    public ResponseEntity<?> requestGetOrders(@PageableDefault(page = 0, size = 10) Pageable pageable){
+        List<OrderResponseDTO> responseBody = orderService.requestGetOrders(pageable);
 
         return ResponseEntity.ok().body(responseBody);
     }
