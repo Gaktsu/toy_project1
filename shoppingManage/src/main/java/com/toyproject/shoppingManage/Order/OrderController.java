@@ -4,6 +4,8 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.repository.query.Param;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,6 +41,20 @@ public class OrderController {
     @GetMapping("/{id}")
     public ResponseEntity<?> requestGetOrder(@PathVariable @Min(value = 1) Long id){
         OrderResponseDTO responseBody = orderService.requestGetOrder(id);
+
+        return ResponseEntity.ok().body(responseBody);
+    }
+
+    @GetMapping("members/{memberId}")
+    public ResponseEntity<?> requestGetOrderByMemberId(
+            @PathVariable
+            @Min(value = 1)
+            @Param("memberId")
+            Long memberId,
+
+            @PageableDefault(page = 0, size = 10)
+            Pageable pageable){
+        List<OrderResponseDTO> responseBody = orderService.requestGetOrdersByMemberId(memberId, pageable);
 
         return ResponseEntity.ok().body(responseBody);
     }

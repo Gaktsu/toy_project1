@@ -14,4 +14,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             "join fetch o.orderItems oi " +  // 💡 o(Order)가 가진 자식 필드명(orderItems)을 적습니다.
             "join fetch oi.item i ")        // 💡 oi(OrderItem)가 가진 상품 필드명(item)을 적습니다.
     List<Order> findOrderWithItems(Pageable pageable);
+
+    @Query("select o from Order o join fetch o.orderItems oi join fetch oi.item i where member.id = :member_id")
+    List<Order> findOrdersByMemberId(@Param("member_id") Long id, Pageable pageable);
 }

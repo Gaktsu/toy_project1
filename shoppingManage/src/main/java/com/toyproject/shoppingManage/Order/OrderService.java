@@ -52,6 +52,11 @@ public class OrderService {
     }
 
     @Transactional(readOnly = true)
+    public List<OrderResponseDTO> requestGetOrdersByMemberId(Long id, Pageable pageable){
+        return orderRepository.findOrdersByMemberId(id, pageable).stream().map(OrderResponseDTO::from).toList();
+    }
+
+    @Transactional(readOnly = true)
     public OrderResponseDTO requestGetOrder(Long id) {
         Order order = orderRepository.findById(id).orElseThrow(() -> new OrderNotFoundException(ErrorCode.ORDER_NOT_FOUND));
 
