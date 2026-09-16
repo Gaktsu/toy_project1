@@ -17,4 +17,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Query("select o from Order o join fetch o.orderItems oi join fetch oi.item i where member.id = :member_id")
     List<Order> findOrdersByMemberId(@Param("member_id") Long id, Pageable pageable);
+
+    // List<Order> findAllByMember_Id(Long id, Pageable pageable);
 }

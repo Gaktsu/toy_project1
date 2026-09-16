@@ -45,11 +45,11 @@ public class OrderController {
         return ResponseEntity.ok().body(responseBody);
     }
 
-    @GetMapping("members/{memberId}")
+    @GetMapping("/member")
     public ResponseEntity<?> requestGetOrderByMemberId(
+            @RequestParam("memberId")
             @PathVariable
             @Min(value = 1)
-            @Param("memberId")
             Long memberId,
 
             @PageableDefault(page = 0, size = 10)
@@ -58,6 +58,22 @@ public class OrderController {
 
         return ResponseEntity.ok().body(responseBody);
     }
+
+    /*
+    @GetMapping("test")
+    public ResponseEntity<?> requestTest(
+            @RequestParam("memberId")
+            @PathVariable
+            @Min(value = 1)
+            Long memberId,
+
+            @PageableDefault()
+            Pageable pageable){
+        List<OrderResponseDTO> responseBody = orderService.test(memberId, pageable);
+
+        return ResponseEntity.ok().body(responseBody);
+    }
+    */
 
     // ----------------------- RESTAPI : POST --------------------------//
 

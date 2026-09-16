@@ -15,6 +15,7 @@ import com.toyproject.shoppingManage.Order.OrderItems.OrderItem;
 import jakarta.validation.constraints.Min;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -62,6 +63,21 @@ public class OrderService {
 
         return OrderResponseDTO.from(order);
     }
+
+    /*
+    @Transactional(readOnly = true)
+    public List<OrderResponseDTO> test(Long id, @PageableDefault() Pageable pageable){
+        // 1. 기본 메서드명으로 조건 검색해보기
+        Order order = orderRepository.findById(id).orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+        List<OrderResponseDTO> orders = new ArrayList<>();
+        orders.add(OrderResponseDTO.from(order));
+        return orders;
+
+
+        // 2. 메서드명으로 쿼리 시도하기
+        // return orderRepository.findAllByMember_Id(id, pageable).stream().map(OrderResponseDTO::from).toList();
+    }
+    */
 
     // ----------------------- RESTAPI : POST --------------------------//
 
