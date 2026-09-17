@@ -1,8 +1,6 @@
 package com.toyproject.shoppingManage;
 
-import com.toyproject.shoppingManage.Item.ItemRepository;
-import com.toyproject.shoppingManage.Item.ItemResponseDTO;
-import com.toyproject.shoppingManage.Item.ItemService;
+import com.toyproject.shoppingManage.Item.*;
 import com.toyproject.shoppingManage.Member.*;
 import com.toyproject.shoppingManage.Member.Exception.DuplicateMemberException;
 import com.toyproject.shoppingManage.Member.Exception.MemberNotFoundException;
@@ -20,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 @Transactional
@@ -47,11 +46,8 @@ class ShoppingManageApplicationTests {
 
 
 		// then
-		// 기본 입력 검증
 		// member 중복 검사
-		assertThat(response).isNotNull();
-		assertThat(response.id()).isNotNull();
-		assertThat(response.email()).isEqualTo("Hong@naver.com");
+		assertThatThrownBy(() -> memberService.requestRegisterMember(request)).isInstanceOf(MemberNotFoundException.class);
 	}
 
 	@Test
@@ -60,55 +56,88 @@ class ShoppingManageApplicationTests {
 		// given
 		// 회원, 아이템, 주문 개
 ;
-		Long member_id = 1L;
-		Long item_id = 1L;
-		int quantity = 100;
+		String memberName = "홍길동";
+		String memberEmail = "Hong@gmail.com";
 
-		int prevStock = itemService.requestGetItem(item_id).stock();
+		MemberRequestDTO memberRequest = new MemberRequestDTO(memberName, memberEmail);
+		MemberResponseDTO memberResponse = memberService.requestRegisterMember(memberRequest);
 
-		List<OrderItemRequestDTO> orderItems = new ArrayList<>();
-		orderItems.add(new OrderItemRequestDTO(item_id, quantity));
+		String itemName = "싱싱한 딸기";
+		Integer itemPrice = 5000;
+		Integer itemStock = 40;
+
+		ItemRequestDTO itemRequest = new ItemRequestDTO(itemName, itemPrice, itemStock);
+		ItemResponseDTO itemResponse = itemService.requestRegisterItem(itemRequest);
+
+		Integer orderItemQuantity = 10;
+
+		List<OrderItemRequestDTO> orderItemsRequest = new ArrayList<>();
+		OrderItemRequestDTO orderItemRequest = new OrderItemRequestDTO(itemResponse.id(), orderItemQuantity);
+		orderItemsRequest.add(orderItemRequest);
+
+		OrderRequestDTO orderRequest = new OrderRequestDTO(memberResponse.id(), orderItemsRequest);
+
+		int prevStock = itemResponse.stock();
 
 		// when
 		// 주문 생성
 
-		orderService.requestOrderProcess(new OrderRequestDTO(member_id, orderItems));
+		orderService.requestOrderProcess(new OrderRequestDTO(memberResponse.id(), orderItemsRequest));
 
-		int curStock = itemService.requestGetItem(item_id).stock();
+		itemResponse = itemService.requestGetItem(itemResponse.id());
 
+		int curStock = itemResponse.stock();
 		// then
 		// 재고 감소 확인
-		assertThat(prevStock).isEqualTo(curStock + quantity);
+		assertThat(curStock).isEqualTo(prevStock - orderItemQuantity);
 	}
 
 	@Test
 	@DisplayName("주문 취소 시 재고 복구")
 	void RestoreStockCancelOrder(){
 		// given
-		// 주문
+		// 회원, 아이템, 주문
+		String memberName = "홍길동";
+		String memberEmail = "Hong@gmail.com";
 
-		Long order_id = 1L;
+		MemberRequestDTO memberRequest = new MemberRequestDTO(memberName, memberEmail);
+		MemberResponseDTO memberResponse = memberService.requestRegisterMember(memberRequest);
 
-		OrderResponseDTO response = orderService.requestGetOrder(order_id);
+		String itemName = "싱싱한 딸기";
+		Integer itemPrice = 5000;
+		Integer itemStock = 40;
 
- 		// when
+		ItemRequestDTO itemRequest = new ItemRequestDTO(itemName, itemPrice, itemStock);
+		ItemResponseDTO itemResponse = itemService.requestRegisterItem(itemRequest);
+
+		Integer orderItemQuantity = 10;
+
+		List<OrderItemRequestDTO> orderItemsRequest = new ArrayList<>();
+		OrderItemRequestDTO orderItemRequest = new OrderItemRequestDTO(itemResponse.id(), orderItemQuantity);
+		orderItemsRequest.add(orderItemRequest);
+
+		OrderRequestDTO orderRequest = new OrderRequestDTO(memberResponse.id(), orderItemsRequest);
+
+		int initStock = itemResponse.stock();
+
+		// when
+		// 주문 생성
 		// 주문 취소
 
-		List<OrderItemResponseDTO> itemResponse = response.items();
-		List<Integer> expectedRestoreStock = new ArrayList<>();
+		OrderResponseDTO orderResponse = orderService.requestOrderProcess(new OrderRequestDTO(memberResponse.id(), orderItemsRequest));
+		itemResponse = itemService.requestGetItem(itemResponse.id());
 
-		for(var item : itemResponse){
-			expectedRestoreStock.add(itemService.requestGetItem(item.itemId()).stock() + item.quantity());
-		}
+		int decreasedStock = itemResponse.stock();
 
-		orderService.requestDeleteOrder(order_id);
+		orderService.requestDeleteOrder(orderResponse.id());
+		itemResponse = itemService.requestGetItem(itemResponse.id());
+
+		int restoredStock = itemResponse.stock();
 
 		// then
+		// 재고 감소 확인
 		// 재고 복구 확인
-		for(int i = 0; i < itemResponse.size(); i++){
-			int stock = itemService.requestGetItem(itemResponse.get(i).itemId()).stock();
-			int expectedStock = expectedRestoreStock.get(i);
-			assertThat(stock).isEqualTo(expectedStock);
-		}
+		assertThat(decreasedStock).isEqualTo(initStock - orderItemQuantity);
+		assertThat(restoredStock).isEqualTo(decreasedStock + orderItemQuantity);
 	}
 }
