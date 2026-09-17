@@ -66,7 +66,7 @@ public class OrderService {
 
     /*
     @Transactional(readOnly = true)
-    public List<OrderResponseDTO> test(Long id, @PageableDefault() Pageable pageable){
+    public List<OrderResponseDTO> test(Long id, Pageable pageable){
         // 1. 기본 메서드명으로 조건 검색해보기
         Order order = orderRepository.findById(id).orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
         List<OrderResponseDTO> orders = new ArrayList<>();

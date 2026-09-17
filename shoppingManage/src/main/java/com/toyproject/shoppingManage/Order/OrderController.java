@@ -48,8 +48,7 @@ public class OrderController {
     @GetMapping("/member")
     public ResponseEntity<?> requestGetOrderByMemberId(
             @RequestParam("memberId")
-            @PathVariable
-            @Min(value = 1)
+            @Min(1)
             Long memberId,
 
             @PageableDefault(page = 0, size = 10)
