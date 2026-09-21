@@ -11,6 +11,7 @@ public enum ErrorCode {
     // ----------------------- 400 : BAD REQUEST --------------------------//
 
     NOT_ENOUGH_STOCK(HttpStatus.BAD_REQUEST, "재고 수량이 부족합니다."),
+    EMPTY_REQUEST_BODY(HttpStatus.BAD_REQUEST, "최소 하나 이상의 필드 값이 필요합니다."),
 
     // ----------------------- 404 : NOT FOUND --------------------------//
 

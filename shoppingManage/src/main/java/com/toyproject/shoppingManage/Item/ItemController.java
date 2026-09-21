@@ -38,4 +38,15 @@ public class ItemController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
     }
+
+    // ----------------------- RESTAPI : PUT / PATCH --------------------------//
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> requestUpdateData_Test(@PathVariable @Min(1) Long id, @Valid @RequestBody ItemUpdateRequestDTO request){
+        ItemResponseDTO responseBody = itemService.requestUpdateItem_PATCH(id, request);
+
+        return ResponseEntity.ok().body(responseBody);
+    }
+
+    // ----------------------- RESTAPI : PATCH --------------------------//
 }

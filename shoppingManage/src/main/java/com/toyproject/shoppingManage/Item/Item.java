@@ -54,4 +54,8 @@ public class Item {
         stock -= quantity;
     }
     public void increaseStock(int value) { stock += value; }
+
+    public void updateName(String name) { this.name = name; }
+    public void updatePrice(int price){ this.price = price; }
+    public void updateStock(int stock) { this.stock = stock;}
 }

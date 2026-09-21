@@ -47,7 +47,7 @@ class ShoppingManageApplicationTests {
 
 		// then
 		// member 중복 검사
-		assertThatThrownBy(() -> memberService.requestRegisterMember(request)).isInstanceOf(MemberNotFoundException.class);
+		assertThatThrownBy(() -> memberService.requestRegisterMember(request)).isInstanceOf(DuplicateMemberException.class);
 	}
 
 	@Test
@@ -139,5 +139,31 @@ class ShoppingManageApplicationTests {
 		// 재고 복구 확인
 		assertThat(decreasedStock).isEqualTo(initStock - orderItemQuantity);
 		assertThat(restoredStock).isEqualTo(decreasedStock + orderItemQuantity);
+	}
+
+	@Test
+	@DisplayName("상품 가격 및 재고 변경")
+	@Transactional
+	void UpdateItemPrice_Stock(){
+		// given
+		// 아이템 하나 생성 및 등록
+
+		String name = "싱싱한 딸기";
+		Integer price = 1500;
+		Integer stock = 50;
+
+		ItemRequestDTO itemRequest = new ItemRequestDTO(name, price, stock);
+
+		ItemResponseDTO itemResponse = itemService.requestRegisterItem(itemRequest);
+
+		// when
+		// 데이터 수정
+		ItemUpdateRequestDTO itemUpdateRequest = new ItemUpdateRequestDTO(3000, 100);
+		itemResponse = itemService.requestUpdateItem_PATCH(itemResponse.id(), itemUpdateRequest);
+
+		// then
+		// 데이터 수정 처리가 되었는지 검증
+		assertThat(price).isNotEqualTo(itemResponse.price());
+		assertThat(stock).isNotEqualTo(itemResponse.stock());
 	}
 }

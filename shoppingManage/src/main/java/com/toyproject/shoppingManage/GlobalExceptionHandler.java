@@ -42,6 +42,12 @@ public class GlobalExceptionHandler {
         return returnResponseEntity(errorCode);
     }
 
+    @ExceptionHandler(EmptyBodyRequestException.class)
+    public ResponseEntity<?> handleEmptyBodyRequestException(EmptyBodyRequestException e){
+        ErrorCode errorCode = e.getErrorCode();
+        return returnResponseEntity(errorCode);
+    }
+
     public ResponseEntity<?> returnResponseEntity(ErrorCode errorCode){
         return ResponseEntity.status(errorCode.getHttpStatus()).body(new ErrorResponse(errorCode.name(), errorCode.getMessage()));
     }
