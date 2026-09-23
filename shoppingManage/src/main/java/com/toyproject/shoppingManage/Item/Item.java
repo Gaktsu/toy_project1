@@ -3,15 +3,18 @@ package com.toyproject.shoppingManage.Item;
 import com.toyproject.shoppingManage.ErrorCode;
 import com.toyproject.shoppingManage.Order.Exception.NotEnoughStockException;
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.validation.annotation.Validated;
 
 @Entity
 @Table(name = "Item")
 @Getter
+@Validated
 public class Item {
 
     // ----------------------- FIELD --------------------------//
@@ -56,6 +59,6 @@ public class Item {
     public void increaseStock(int value) { stock += value; }
 
     public void updateName(String name) { this.name = name; }
-    public void updatePrice(int price){ this.price = price; }
+    public void updatePrice(@Valid @Min(1) int price){ this.price = price; }
     public void updateStock(int stock) { this.stock = stock;}
 }

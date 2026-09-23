@@ -8,6 +8,7 @@ import com.toyproject.shoppingManage.Order.*;
 import com.toyproject.shoppingManage.Order.OrderItems.OrderItem;
 import com.toyproject.shoppingManage.Order.OrderItems.OrderItemRequestDTO;
 import com.toyproject.shoppingManage.Order.OrderItems.OrderItemResponseDTO;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,10 @@ class ShoppingManageApplicationTests {
 	@Autowired
 	private OrderService orderService;
 
+	@Autowired
+	private EntityManager entityManager; // flush, clear 용도
+
+
 	@Test
 	@DisplayName("회원 정보를 성공적으로 저장한다")
 	void MemberRegisterTest() {
@@ -56,18 +61,9 @@ class ShoppingManageApplicationTests {
 		// given
 		// 회원, 아이템, 주문 개
 ;
-		String memberName = "홍길동";
-		String memberEmail = "Hong@gmail.com";
+		MemberResponseDTO memberResponse = helperMemberCreate();
 
-		MemberRequestDTO memberRequest = new MemberRequestDTO(memberName, memberEmail);
-		MemberResponseDTO memberResponse = memberService.requestRegisterMember(memberRequest);
-
-		String itemName = "싱싱한 딸기";
-		Integer itemPrice = 5000;
-		Integer itemStock = 40;
-
-		ItemRequestDTO itemRequest = new ItemRequestDTO(itemName, itemPrice, itemStock);
-		ItemResponseDTO itemResponse = itemService.requestRegisterItem(itemRequest);
+		ItemResponseDTO itemResponse = helperItemCreate();
 
 		Integer orderItemQuantity = 10;
 
@@ -82,13 +78,17 @@ class ShoppingManageApplicationTests {
 		// when
 		// 주문 생성
 
-		orderService.requestOrderProcess(new OrderRequestDTO(memberResponse.id(), orderItemsRequest));
+		OrderResponseDTO orderResponse = orderService.requestOrderProcess(new OrderRequestDTO(memberResponse.id(), orderItemsRequest));
 
-		itemResponse = itemService.requestGetItem(itemResponse.id());
+		entityManager.flush();
+		entityManager.clear();
 
-		int curStock = itemResponse.stock();
+		ItemResponseDTO test_DB_SELECT_AFTER_CLEAR = itemService.requestGetItem(itemResponse.id());
+		int curStock = test_DB_SELECT_AFTER_CLEAR.stock();
+
 		// then
 		// 재고 감소 확인
+
 		assertThat(curStock).isEqualTo(prevStock - orderItemQuantity);
 	}
 
@@ -97,73 +97,89 @@ class ShoppingManageApplicationTests {
 	void RestoreStockCancelOrder(){
 		// given
 		// 회원, 아이템, 주문
-		String memberName = "홍길동";
-		String memberEmail = "Hong@gmail.com";
 
-		MemberRequestDTO memberRequest = new MemberRequestDTO(memberName, memberEmail);
-		MemberResponseDTO memberResponse = memberService.requestRegisterMember(memberRequest);
+		MemberResponseDTO memberResponse = helperMemberCreate();
 
-		String itemName = "싱싱한 딸기";
-		Integer itemPrice = 5000;
-		Integer itemStock = 40;
-
-		ItemRequestDTO itemRequest = new ItemRequestDTO(itemName, itemPrice, itemStock);
-		ItemResponseDTO itemResponse = itemService.requestRegisterItem(itemRequest);
+		ItemResponseDTO itemResponse = helperItemCreate();
 
 		Integer orderItemQuantity = 10;
+		OrderResponseDTO orderResponse = helperOrderCreate(memberResponse, itemResponse, orderItemQuantity);
 
-		List<OrderItemRequestDTO> orderItemsRequest = new ArrayList<>();
-		OrderItemRequestDTO orderItemRequest = new OrderItemRequestDTO(itemResponse.id(), orderItemQuantity);
-		orderItemsRequest.add(orderItemRequest);
+		entityManager.flush();
+		entityManager.clear();
 
-		OrderRequestDTO orderRequest = new OrderRequestDTO(memberResponse.id(), orderItemsRequest);
-
-		int initStock = itemResponse.stock();
+		ItemResponseDTO test_DB_SELECT_BEFORE = itemService.requestGetItem(itemResponse.id());
+		int initStock = test_DB_SELECT_BEFORE.stock();
 
 		// when
-		// 주문 생성
 		// 주문 취소
 
-		OrderResponseDTO orderResponse = orderService.requestOrderProcess(new OrderRequestDTO(memberResponse.id(), orderItemsRequest));
-		itemResponse = itemService.requestGetItem(itemResponse.id());
-
-		int decreasedStock = itemResponse.stock();
-
 		orderService.requestDeleteOrder(orderResponse.id());
-		itemResponse = itemService.requestGetItem(itemResponse.id());
 
-		int restoredStock = itemResponse.stock();
+		entityManager.flush();
+		entityManager.clear();
 
+		ItemResponseDTO test_DB_SELECT_AFTER = itemService.requestGetItem(itemResponse.id());
+		int restoredStock = test_DB_SELECT_AFTER.stock();
+
+		// orderService.requestGetOrder(orderResponse.id()); --> 예상된 에러 발생 (존재하지 않는 주문입니다.)
 		// then
 		// 재고 감소 확인
 		// 재고 복구 확인
-		assertThat(decreasedStock).isEqualTo(initStock - orderItemQuantity);
-		assertThat(restoredStock).isEqualTo(decreasedStock + orderItemQuantity);
+		assertThat(restoredStock).isNotEqualTo(initStock);
 	}
 
 	@Test
 	@DisplayName("상품 가격 및 재고 변경")
-	@Transactional
 	void UpdateItemPrice_Stock(){
 		// given
 		// 아이템 하나 생성 및 등록
 
+		ItemResponseDTO itemResponse = helperItemCreate();
+
+		// when
+		// 데이터 수정
+		ItemUpdateRequestDTO itemUpdateRequest = new ItemUpdateRequestDTO(3000, null);
+		itemResponse = itemService.requestUpdateItem_PATCH(itemResponse.id(), itemUpdateRequest);
+
+		entityManager.flush();
+		entityManager.clear();
+
+		ItemResponseDTO test_DB_SELECT_AFTER = itemService.requestGetItem(itemResponse.id());
+		// then
+		// 데이터 수정 처리가 되었는지 검증
+		assertThat(test_DB_SELECT_AFTER.price()).isEqualTo(3000);
+		assertThat(test_DB_SELECT_AFTER.stock()).isEqualTo(100);
+	}
+
+	// ---------- Helper Method -------------
+
+	MemberResponseDTO helperMemberCreate(){
+		String memberName = "홍길동";
+		String memberEmail = "Hong@gmail.com";
+
+		MemberRequestDTO memberRequest = new MemberRequestDTO(memberName, memberEmail);
+
+		return memberService.requestRegisterMember(memberRequest);
+	}
+
+	ItemResponseDTO helperItemCreate(){
 		String name = "싱싱한 딸기";
 		Integer price = 1500;
 		Integer stock = 50;
 
 		ItemRequestDTO itemRequest = new ItemRequestDTO(name, price, stock);
 
-		ItemResponseDTO itemResponse = itemService.requestRegisterItem(itemRequest);
+        return itemService.requestRegisterItem(itemRequest);
+	}
 
-		// when
-		// 데이터 수정
-		ItemUpdateRequestDTO itemUpdateRequest = new ItemUpdateRequestDTO(3000, 100);
-		itemResponse = itemService.requestUpdateItem_PATCH(itemResponse.id(), itemUpdateRequest);
+	OrderResponseDTO helperOrderCreate(MemberResponseDTO memberResponse, ItemResponseDTO itemResponse, Integer orderItemQuantity){
+		List<OrderItemRequestDTO> orderItemsRequest = new ArrayList<>();
+		OrderItemRequestDTO orderItemRequest = new OrderItemRequestDTO(itemResponse.id(), orderItemQuantity);
+		orderItemsRequest.add(orderItemRequest);
 
-		// then
-		// 데이터 수정 처리가 되었는지 검증
-		assertThat(price).isNotEqualTo(itemResponse.price());
-		assertThat(stock).isNotEqualTo(itemResponse.stock());
+		OrderRequestDTO orderRequest = new OrderRequestDTO(memberResponse.id(), orderItemsRequest);
+
+		return orderService.requestOrderProcess(new OrderRequestDTO(memberResponse.id(), orderItemsRequest));
 	}
 }

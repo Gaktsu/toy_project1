@@ -38,9 +38,7 @@ public class ItemService {
 
     @Transactional
     public ItemResponseDTO requestUpdateItem_PATCH(Long id, ItemUpdateRequestDTO request) {
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        if(objectMapper.valueToTree(request).isEmpty())
+        if(request.price() == null && request.stock() == null)
             throw new EmptyBodyRequestException(ErrorCode.EMPTY_REQUEST_BODY);
 
         Item item = itemRepository.findById(id).orElseThrow(() -> new ItemNotFoundException(ErrorCode.ITEM_NOT_FOUND));
